@@ -25,34 +25,29 @@ func (t Transform) tr(x int, r Range) int {
 
 // Run transforms an input range into a list of output ranges.
 func (t Transform) Run(x [2]int) [][2]int {
+	curr := [2]int{}
 	out := [][2]int{}
 	rem := [][2]int{x}
 
 	for len(rem) > 0 {
-		curr := rem[0]
-		tmp := make([][2]int, len(rem)-1)
-		copy(tmp, rem[1:])
-		rem = tmp
+		curr, rem = rem[0], rem[1:]
 
 		found := false
 		for _, r := range t.ranges {
 			// No overlap.
 			if curr[0]+curr[1] <= r.src || curr[0] >= r.src+r.len {
-				//fmt.Println("No overlap:", r)
 				continue
 			}
 
-			if curr[0] >= r.src {
-				// Full overlap.
-				if curr[0]+curr[1] <= r.src+r.len {
-					//fmt.Println("Full:", r)
-					out = append(out, [2]int{t.tr(curr[0], r), curr[1]})
-					found = true
-					break
-				}
+			// Full overlap.
+			if curr[0] >= r.src && curr[0]+curr[1] <= r.src+r.len {
+				out = append(out, [2]int{t.tr(curr[0], r), curr[1]})
+				found = true
+				break
+			}
 
-				// Partial left overlap
-				//fmt.Println("Left:", r)
+			// Partial left overlap.
+			if curr[0] >= r.src {
 				overlap := r.src + r.len - curr[0]
 				out = append(out, [2]int{t.tr(curr[0], r), overlap})
 				rem = append(rem, [2]int{curr[0] + overlap, curr[1] - overlap})
@@ -60,9 +55,8 @@ func (t Transform) Run(x [2]int) [][2]int {
 				break
 			}
 
-			// Partial right overlap
+			// Partial right overlap.
 			if curr[0]+curr[1] <= r.src+r.len {
-				//fmt.Println("Right:", r)
 				overlap := curr[0] + curr[1] - r.src
 				out = append(out, [2]int{t.tr(r.src, r), overlap})
 				rem = append(rem, [2]int{curr[0], curr[1] - overlap})
@@ -71,7 +65,6 @@ func (t Transform) Run(x [2]int) [][2]int {
 			}
 
 			// Center overlap
-			//fmt.Println("Center:", r)
 			out = append(out, [2]int{t.tr(r.src, r), r.len})
 			rem = append(rem, [2]int{curr[0], r.src - curr[0]})
 			rem = append(rem, [2]int{r.src + r.len, curr[0] + curr[1] - r.src - r.len})
