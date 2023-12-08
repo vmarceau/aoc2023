@@ -88,23 +88,15 @@ func parse(line string) Hand {
 }
 
 func cmp(a, b Hand) int {
-	if a.score < b.score {
-		return -1
-	}
-
-	if a.score > b.score {
-		return 1
+	if a.score != b.score {
+		return a.score - b.score
 	}
 
 	for i := 0; i < 5; i++ {
 		ca := index[a.cards[i]]
 		cb := index[b.cards[i]]
-		if ca < cb {
-			return -1
-		}
-
-		if ca > cb {
-			return 1
+		if ca != cb {
+			return ca - cb
 		}
 	}
 
