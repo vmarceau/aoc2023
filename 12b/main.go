@@ -20,6 +20,10 @@ func parse(line string) ([]string, []int) {
 		panic("invalid input:" + line)
 	}
 
+	// Unfold
+	parts[0] = strings.Join([]string{parts[0], parts[0], parts[0], parts[0], parts[0]}, "?")
+	parts[1] = strings.Join([]string{parts[1], parts[1], parts[1], parts[1], parts[1]}, ",")
+
 	vals := strings.Split(parts[0], "")
 
 	groups := []int{}
